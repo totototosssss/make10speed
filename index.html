@@ -17,6 +17,7 @@
             --accent: #0071e3;
             --border: #d2d2d7;
             --danger: #ff3b30;
+            --success: #34c759;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
@@ -35,7 +36,6 @@
         }
         @media(min-width: 500px) { #app { height: 95vh; margin-top: 2.5vh; border-radius: 18px; border: 1px solid #e5e5ea; overflow: hidden; } }
 
-        /* Screens */
         .screen {
             position: absolute; inset: 0; padding: 24px;
             display: flex; flex-direction: column;
@@ -47,7 +47,6 @@
         h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; text-align: center; }
         .label { font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
         
-        /* Inputs */
         input {
             width: 100%; padding: 14px; font-size: 18px; border: 1px solid var(--border);
             border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px;
@@ -55,17 +54,13 @@
         }
         input:focus { border-color: var(--accent); background: #fff; }
 
-        /* Buttons */
         .btn {
             border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600;
             cursor: pointer; width: 100%; transition: opacity 0.2s, transform 0.1s;
         }
         .btn:active { transform: scale(0.98); opacity: 0.8; }
         .btn-primary { background: var(--text); color: #fff; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-danger { color: var(--danger); border-color: var(--danger); }
-
-        /* Mode Select */
+        
         .mode-group { display: flex; gap: 12px; margin-bottom: 30px; }
         .mode-opt {
             flex: 1; padding: 16px; border: 1px solid var(--border); border-radius: 10px;
@@ -77,20 +72,21 @@
         /* Game Header */
         .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid #f5f5f7; margin-bottom: 16px; }
         .stat-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .penalty-badge { color: var(--danger); font-size: 11px; font-weight: 700; display: none; }
-        .penalty-badge.show { display: inline; }
+        
+        .badge-area { font-size: 11px; font-weight: 700; height: 16px; display: flex; gap: 5px; justify-content: flex-end;}
+        .pen-badge { color: var(--danger); display: none; }
+        .bonus-badge { color: var(--success); display: none; }
+        .show { display: inline; animation: flash 1s; }
 
-        /* Formula */
         .formula-box {
             height: 64px; background: #f5f5f7; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 26px; font-weight: 500; margin-bottom: 16px;
-            border: 2px solid transparent;
+            border: 2px solid transparent; overflow: hidden; white-space: nowrap;
         }
         .formula-box.error { border-color: var(--danger); color: var(--danger); }
-        .formula-box.success { border-color: #34c759; color: #34c759; background: #eaffef; }
+        .formula-box.success { border-color: var(--success); color: var(--success); background: #eaffef; }
 
-        /* Card Field */
         .field {
             display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
             align-content: flex-start; margin-bottom: auto; min-height: 120px;
@@ -102,22 +98,23 @@
             width: calc(20% - 7px); aspect-ratio: 0.8;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative;
         }
-        /* Hard Mode (7 cards) styling */
         .field.hard .card { width: calc(14.2% - 7px); font-size: 20px; }
-        
         .card.selected { background: var(--text); color: #fff; border-color: var(--text); transform: translateY(-4px); }
         .card.empty { visibility: hidden; pointer-events: none; }
 
-        /* Controls */
         .controls { background: #f5f5f7; border-radius: 16px; padding: 12px; }
-        
         .sub-actions { display: flex; gap: 8px; margin-bottom: 12px; }
         .btn-sub {
             flex: 1; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 8px;
             border: 1px solid #e5e5ea; background: #fff; color: var(--sub-text); cursor: pointer;
         }
-        
+
         .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        /* Hide hard keys by default */
+        .key.hard-only { display: none; }
+        /* Show hard keys when parent has class */
+        .keypad.hard-mode .key.hard-only { display: flex; background: #fff5f5; color: #d63384; }
+        
         .key {
             height: 44px; background: #fff; border: 1px solid #e5e5ea; border-radius: 8px;
             font-size: 16px; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center;
@@ -129,24 +126,18 @@
         .key.enter { grid-column: span 2; background: var(--accent); color: #fff; border: none; font-weight: 600; }
         .key.del { color: var(--danger); }
 
-        /* Result */
         .rank-list {
             margin-top: 24px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
             max-height: 250px; overflow-y: auto; background: #fff;
         }
-        .rank-row {
-            display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f5f5f7; font-size: 13px;
-        }
-        .rank-row:last-child { border-bottom: none; }
+        .rank-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f5f5f7; font-size: 13px; }
         .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 6px; }
         .badge-easy { background: #e3f2fd; color: var(--accent); }
         .badge-hard { background: #ffebee; color: var(--danger); }
-
-        /* Result Info */
-        .res-info {
-            display: flex; justify-content: space-between; width: 100%;
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 12px; margin-bottom: 12px;
-        }
+        
+        .res-info { display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #e5e5ea; padding-bottom: 12px; margin-bottom: 12px; }
+        
+        @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0} }
     </style>
 </head>
 <body>
@@ -155,7 +146,6 @@
     <div id="s-login" class="screen active">
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
             <h1>Make10 Speed</h1>
-            <p style="text-align:center; color:var(--sub-text); font-size:14px; margin-bottom:32px;">Logic & Reflexes</p>
             
             <span class="label">PLAYER NAME</span>
             <input type="text" id="username" placeholder="Name" maxlength="10">
@@ -164,11 +154,11 @@
             <div class="mode-group">
                 <div class="mode-opt selected" onclick="app.setMode('easy')" id="m-easy">
                     EASY
-                    <div class="mode-desc">0-9 / 5 Cards</div>
+                    <div class="mode-desc">0-9 / 5 Cards<br>Basic Math Only</div>
                 </div>
                 <div class="mode-opt" onclick="app.setMode('hard')" id="m-hard">
                     HARD
-                    <div class="mode-desc">1-30 / 7 Cards</div>
+                    <div class="mode-desc">1-30 / 7 Cards<br>Full Adv. Math</div>
                 </div>
             </div>
 
@@ -183,27 +173,37 @@
                 <div class="stat-val" id="deck-disp">0</div>
             </div>
             <div style="text-align:right;">
-                <span class="label">TIME <span id="pen-badge" class="penalty-badge">+PENALTY</span></span>
+                <span class="label">TIME</span>
                 <div class="stat-val" id="timer">0.00</div>
+                <div class="badge-area">
+                    <span id="bonus-badge" class="bonus-badge">-10s BONUS!</span>
+                    <span id="pen-badge" class="pen-badge">+PENALTY</span>
+                </div>
             </div>
         </div>
 
         <div id="formula" class="formula-box"></div>
 
-        <div id="field" class="field">
-            </div>
+        <div id="field" class="field"></div>
 
         <div class="controls">
             <div class="sub-actions">
-                <button class="btn-sub" onclick="game.pass()">PASS (+20s)</button>
+                <button class="btn-sub" onclick="game.pass()">PASS (+5s)</button>
                 <button class="btn-sub" style="color:var(--danger)" onclick="game.retire()">RETIRE (Give Up)</button>
             </div>
-            <div class="keypad">
+            
+            <div id="keypad" class="keypad">
+                <button class="key func hard-only" onclick="game.push('^')">XOR</button>
+                <button class="key func hard-only" onclick="game.push('&')">AND</button>
+                <button class="key func hard-only" onclick="game.push('|')">OR</button>
+                <button class="key func hard-only" onclick="game.push('<<')">&lt;&lt;</button>
+                <button class="key func hard-only" onclick="game.push('>>')">&gt;&gt;</button>
+
                 <button class="key func" onclick="game.push('Math.sqrt(')">√</button>
                 <button class="key func" onclick="game.push('Math.abs(')">ABS</button>
                 <button class="key func" onclick="game.push('Math.floor(')">FLR</button>
-                <button class="key func" onclick="game.push('^')">XOR</button>
-                <button class="key func" onclick="game.push('&')">AND</button>
+                <button class="key func hard-only" onclick="game.push('%')">MOD</button>
+                <button class="key func hard-only" onclick="game.push('~')">NOT</button>
 
                 <button class="key op" onclick="game.push('+')">+</button>
                 <button class="key op" onclick="game.push('-')">&minus;</button>
@@ -215,12 +215,9 @@
                 <button class="key op" onclick="game.push(')')">)</button>
                 <button class="key del" onclick="game.pop()">DEL</button>
                 <button class="key" onclick="game.clear()">CLR</button>
-                <button class="key func" onclick="game.push('|')">OR</button>
-
-                <button class="key func" onclick="game.push('%')">MOD</button>
-                <button class="key func" onclick="game.push('~')">NOT</button>
                 <button class="key" onclick="game.push('.')">.</button>
-                <button class="key enter" onclick="game.submit()">ENTER</button>
+
+                <button class="key enter" style="grid-column:1/-1" onclick="game.submit()">ENTER</button>
             </div>
         </div>
     </div>
@@ -241,7 +238,8 @@
             </div>
 
             <div style="width:100%; font-size:12px; color:var(--sub-text); margin-bottom:20px;">
-                Penalty Added: <span id="res-pen">0</span>s
+                Penalty: <span id="res-pen" style="color:var(--danger)">0</span>s | 
+                Bonus: <span id="res-bonus" style="color:var(--success)">0</span>s
             </div>
 
             <span class="label" style="width:100%">GLOBAL RANKING</span>
@@ -297,6 +295,7 @@
         input: [],
         startTime: 0,
         penTime: 0,
+        bonusTime: 0,
         timer: null,
         active: false,
 
@@ -305,42 +304,55 @@
             this.mode = mode;
             this.conf = MODES[mode];
             
-            // Setup Deck
+            // Deck
             this.deck = [];
             const range = this.conf.max - this.conf.min + 1;
             for(let i=0; i<this.conf.deck; i++) {
                 this.deck.push(Math.floor(Math.random()*range) + this.conf.min);
             }
 
-            // Setup Field
+            // Field
             this.field = new Array(this.conf.field).fill(null);
             this.fillField();
 
-            // Switch Screen
+            // UI Changes
             document.getElementById('s-login').classList.remove('active');
             document.getElementById('s-game').classList.add('active');
             
             const fieldEl = document.getElementById('field');
-            if(mode==='hard') fieldEl.classList.add('hard');
-            else fieldEl.classList.remove('hard');
+            if(mode==='hard') {
+                fieldEl.classList.add('hard');
+                document.getElementById('keypad').classList.add('hard-mode');
+            } else {
+                fieldEl.classList.remove('hard');
+                document.getElementById('keypad').classList.remove('hard-mode');
+            }
 
             this.input = [];
             this.penTime = 0;
+            this.bonusTime = 0;
             this.active = true;
             this.startTime = Date.now();
             
             this.render();
             
-            // Loop
             if(this.timer) clearInterval(this.timer);
             this.timer = setInterval(() => {
                 if(!this.active) return;
                 const now = (Date.now() - this.startTime)/1000;
-                document.getElementById('timer').innerText = (now + this.penTime).toFixed(2);
+                // Total Time = RealTime + Penalty - Bonus (min 0)
+                let total = now + this.penTime - this.bonusTime;
+                if(total < 0) total = 0;
                 
-                // Show penalty badge
-                const badge = document.getElementById('pen-badge');
-                if(this.penTime > 0) badge.classList.add('show');
+                document.getElementById('timer').innerText = total.toFixed(2);
+                
+                // Badges
+                const penB = document.getElementById('pen-badge');
+                if(this.penTime > 0) penB.style.display = 'inline';
+                
+                const bonB = document.getElementById('bonus-badge');
+                if(this.bonusTime > 0) bonB.style.display = 'inline';
+
             }, 50);
         },
 
@@ -397,7 +409,8 @@
             if(!this.active || this.input.length===0) return;
             const expr = this.input.map(i => i.val).join('');
             try {
-                if(/[^0-9+\-*/().Mathsqrtfloorabs%&|^~]/g.test(expr)) throw new Error("Inv");
+                // Safety: Allow shift operators << >>
+                if(/[^0-9+\-*/().Mathsqrtfloorabs%&|^~<>\s]/g.test(expr)) throw new Error("Inv");
                 const res = Function('"use strict";return (' + expr + ')')();
                 
                 if(Math.abs(res - 10) < 0.00001) {
@@ -412,6 +425,18 @@
             document.getElementById('formula').classList.add('success');
             const usedIds = this.input.filter(i => i.type==='num').map(i=>i.refId);
             
+            // Check Perfect Field Clear Bonus
+            // Count valid cards on field currently
+            const activeCardsCount = this.field.filter(x => x !== null).length;
+            if (usedIds.length === activeCardsCount && usedIds.length > 1) {
+                // All cards used!
+                this.bonusTime += 10;
+                const bBadge = document.getElementById('bonus-badge');
+                bBadge.classList.remove('show');
+                void bBadge.offsetWidth; // trigger reflow
+                bBadge.classList.add('show');
+            }
+
             for(let i=0; i<this.field.length; i++) {
                 if(this.field[i] && usedIds.includes(this.field[i].id)) this.field[i] = null;
             }
@@ -430,8 +455,9 @@
         },
 
         pass() {
-            if(!this.active || !confirm("Pass & Refresh? (+20s Penalty)")) return;
-            this.penTime += 20;
+            if(!this.active || !confirm("PASS? (+5s Penalty)")) return;
+            this.penTime += 5; // Reduced from 20 to 5
+            
             // Reroll current field
             const range = this.conf.max - this.conf.min + 1;
             for(let i=0; i<this.field.length; i++) {
@@ -442,12 +468,18 @@
             }
             this.input = [];
             this.render();
+            
+            const pBadge = document.getElementById('pen-badge');
+            pBadge.classList.remove('show');
+            void pBadge.offsetWidth;
+            pBadge.classList.add('show');
         },
 
         retire() {
             if(!this.active || !confirm("Give up?")) return;
+            // Count remaining cards
             const rem = this.deck.length + this.field.filter(x=>x).length;
-            this.penTime += (rem * 7);
+            this.penTime += (rem * 12); // Increased to 12s per card
             this.finish("RETIRED");
         },
 
@@ -455,7 +487,8 @@
             this.active = false;
             clearInterval(this.timer);
             const timeRaw = (Date.now() - this.startTime)/1000;
-            const finalTime = timeRaw + this.penTime;
+            let finalTime = timeRaw + this.penTime - this.bonusTime;
+            if(finalTime < 0) finalTime = 0;
 
             document.getElementById('s-game').classList.remove('active');
             document.getElementById('s-result').classList.add('active');
@@ -464,10 +497,11 @@
             document.getElementById('res-time').innerText = finalTime.toFixed(2) + 's';
             document.getElementById('res-mode').innerText = this.mode.toUpperCase();
             document.getElementById('res-pen').innerText = this.penTime;
+            document.getElementById('res-bonus').innerText = this.bonusTime;
             
             // Save & Load
             if(db) {
-                db.collection("make10_scores_v4").add({
+                db.collection("make10_scores_final").add({
                     name: this.user,
                     mode: this.mode,
                     time: finalTime,
@@ -480,9 +514,7 @@
 
         loadRanking() {
             if(!db) return;
-            // Showing top 20 irrespective of mode, allowing hard/easy comparison
-            // or we could filter. For now, mixed ranking by time.
-            db.collection("make10_scores_v4").orderBy("time", "asc").limit(20).get().then(snap => {
+            db.collection("make10_scores_final").orderBy("time", "asc").limit(20).get().then(snap => {
                 let html = '';
                 let rank = 1;
                 snap.forEach(doc => {
