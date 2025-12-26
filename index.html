@@ -19,6 +19,11 @@
             --danger: #ff3b30;
             --success: #34c759;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            
+            /* Ranking Colors */
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
         }
 
         * { box-sizing: border-box; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -110,9 +115,7 @@
         }
 
         .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        /* Hide hard keys by default */
         .key.hard-only { display: none; }
-        /* Show hard keys when parent has class */
         .keypad.hard-mode .key.hard-only { display: flex; background: #fff5f5; color: #d63384; }
         
         .key {
@@ -126,12 +129,31 @@
         .key.enter { grid-column: span 2; background: var(--accent); color: #fff; border: none; font-weight: 600; }
         .key.del { color: var(--danger); }
 
+        /* Result & Ranking */
         .rank-list {
             margin-top: 24px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
             max-height: 250px; overflow-y: auto; background: #fff;
         }
-        .rank-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f5f5f7; font-size: 13px; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 6px; }
+        .rank-row {
+            display: flex; justify-content: space-between; padding: 14px 16px; 
+            border-bottom: 1px solid #f5f5f7; font-size: 14px; align-items: center;
+        }
+        .rank-row:last-child { border-bottom: none; }
+        
+        /* Rank Highlights */
+        .rank-1, .rank-2, .rank-3 { font-weight: 600; }
+        .rank-1 { background-color: #fffae6; }
+        .rank-2 { background-color: #f8f8f8; }
+        .rank-3 { background-color: #fff4e6; }
+        
+        .rank-icon {
+            display: inline-block; width: 20px; text-align: center; margin-right: 8px; font-size: 16px;
+        }
+        .rank-num {
+            display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--sub-text); font-weight: 600;
+        }
+
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 8px; letter-spacing: 0.5px; }
         .badge-easy { background: #e3f2fd; color: var(--accent); }
         .badge-hard { background: #ffebee; color: var(--danger); }
         
@@ -242,7 +264,7 @@
                 Bonus: <span id="res-bonus" style="color:var(--success)">0</span>s
             </div>
 
-            <span class="label" style="width:100%">GLOBAL RANKING</span>
+            <span class="label" style="width:100%">TOP 7 PLAYERS</span>
             <div id="ranking" class="rank-list">Loading...</div>
             
             <button class="btn btn-primary" style="margin-top:auto;" onclick="location.reload()">PLAY AGAIN</button>
@@ -340,19 +362,12 @@
             this.timer = setInterval(() => {
                 if(!this.active) return;
                 const now = (Date.now() - this.startTime)/1000;
-                // Total Time = RealTime + Penalty - Bonus (min 0)
                 let total = now + this.penTime - this.bonusTime;
                 if(total < 0) total = 0;
-                
                 document.getElementById('timer').innerText = total.toFixed(2);
                 
-                // Badges
-                const penB = document.getElementById('pen-badge');
-                if(this.penTime > 0) penB.style.display = 'inline';
-                
-                const bonB = document.getElementById('bonus-badge');
-                if(this.bonusTime > 0) bonB.style.display = 'inline';
-
+                if(this.penTime > 0) document.getElementById('pen-badge').style.display = 'inline';
+                if(this.bonusTime > 0) document.getElementById('bonus-badge').style.display = 'inline';
             }, 50);
         },
 
@@ -372,7 +387,6 @@
 
         render() {
             document.getElementById('deck-disp').innerText = this.deck.length;
-            
             const fBox = document.getElementById('formula');
             fBox.innerText = this.input.map(i => i.val).join(' ');
             fBox.className = 'formula-box';
@@ -409,7 +423,6 @@
             if(!this.active || this.input.length===0) return;
             const expr = this.input.map(i => i.val).join('');
             try {
-                // Safety: Allow shift operators << >>
                 if(/[^0-9+\-*/().Mathsqrtfloorabs%&|^~<>\s]/g.test(expr)) throw new Error("Inv");
                 const res = Function('"use strict";return (' + expr + ')')();
                 
@@ -424,16 +437,12 @@
         success() {
             document.getElementById('formula').classList.add('success');
             const usedIds = this.input.filter(i => i.type==='num').map(i=>i.refId);
-            
-            // Check Perfect Field Clear Bonus
-            // Count valid cards on field currently
             const activeCardsCount = this.field.filter(x => x !== null).length;
             if (usedIds.length === activeCardsCount && usedIds.length > 1) {
-                // All cards used!
                 this.bonusTime += 10;
                 const bBadge = document.getElementById('bonus-badge');
                 bBadge.classList.remove('show');
-                void bBadge.offsetWidth; // trigger reflow
+                void bBadge.offsetWidth;
                 bBadge.classList.add('show');
             }
 
@@ -456,9 +465,7 @@
 
         pass() {
             if(!this.active || !confirm("PASS? (+5s Penalty)")) return;
-            this.penTime += 5; // Reduced from 20 to 5
-            
-            // Reroll current field
+            this.penTime += 5;
             const range = this.conf.max - this.conf.min + 1;
             for(let i=0; i<this.field.length; i++) {
                 if(this.field[i]) {
@@ -477,9 +484,8 @@
 
         retire() {
             if(!this.active || !confirm("Give up?")) return;
-            // Count remaining cards
             const rem = this.deck.length + this.field.filter(x=>x).length;
-            this.penTime += (rem * 12); // Increased to 12s per card
+            this.penTime += (rem * 12);
             this.finish("RETIRED");
         },
 
@@ -499,7 +505,6 @@
             document.getElementById('res-pen').innerText = this.penTime;
             document.getElementById('res-bonus').innerText = this.bonusTime;
             
-            // Save & Load
             if(db) {
                 db.collection("make10_scores_final").add({
                     name: this.user,
@@ -514,19 +519,29 @@
 
         loadRanking() {
             if(!db) return;
-            db.collection("make10_scores_final").orderBy("time", "asc").limit(20).get().then(snap => {
+            // 7名まで取得
+            db.collection("make10_scores_final").orderBy("time", "asc").limit(7).get().then(snap => {
                 let html = '';
                 let rank = 1;
                 snap.forEach(doc => {
                     const d = doc.data();
                     const badgeClass = d.mode === 'hard' ? 'badge-hard' : 'badge-easy';
                     const modeLabel = d.mode === 'hard' ? 'H' : 'E';
+                    
+                    // Rank Styling
+                    let rankClass = '';
+                    let icon = '';
+                    if(rank === 1) { rankClass = 'rank-1'; icon = '🥇'; }
+                    else if(rank === 2) { rankClass = 'rank-2'; icon = '🥈'; }
+                    else if(rank === 3) { rankClass = 'rank-3'; icon = '🥉'; }
+                    else { icon = `<span class="rank-num">${rank}</span>`; }
+
                     html += `
-                    <div class="rank-row">
+                    <div class="rank-row ${rankClass}">
                         <div style="display:flex; align-items:center;">
-                            <span style="width:24px; color:#aaa;">${rank}</span>
+                            <span class="rank-icon">${icon}</span>
                             <span class="badge ${badgeClass}">${modeLabel}</span>
-                            <span style="font-weight:500;">${d.name}</span>
+                            <span>${d.name}</span>
                         </div>
                         <div style="font-weight:700;">${d.time.toFixed(2)}s</div>
                     </div>`;
