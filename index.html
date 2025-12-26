@@ -52,6 +52,10 @@
         h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; text-align: center; }
         .label { font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
         
+        .rule-desc {
+            text-align: center; color: var(--sub-text); font-size: 13px; margin-bottom: 32px; line-height: 1.6;
+        }
+
         input {
             width: 100%; padding: 14px; font-size: 18px; border: 1px solid var(--border);
             border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px;
@@ -115,6 +119,8 @@
         }
 
         .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        
+        /* Advanced math hidden in easy mode */
         .key.hard-only { display: none; }
         .keypad.hard-mode .key.hard-only { display: flex; background: #fff5f5; color: #d63384; }
         
@@ -140,7 +146,6 @@
         }
         .rank-row:last-child { border-bottom: none; }
         
-        /* Rank Highlights */
         .rank-1, .rank-2, .rank-3 { font-weight: 600; }
         .rank-1 { background-color: #fffae6; }
         .rank-2 { background-color: #f8f8f8; }
@@ -168,6 +173,11 @@
     <div id="s-login" class="screen active">
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
             <h1>Make10 Speed</h1>
+            <p class="rule-desc">
+                カードと演算子を組み合わせて「10」を作ってください。<br>
+                全てのカードを使い切ればクリアです。<br>
+                10を作ると使用したカードが補充されます。
+            </p>
             
             <span class="label">PLAYER NAME</span>
             <input type="text" id="username" placeholder="Name" maxlength="10">
@@ -176,11 +186,11 @@
             <div class="mode-group">
                 <div class="mode-opt selected" onclick="app.setMode('easy')" id="m-easy">
                     EASY
-                    <div class="mode-desc">0-9 / 5 Cards<br>Basic Math Only</div>
+                    <div class="mode-desc">0-9 / 20 Cards<br>Basic Math Only</div>
                 </div>
                 <div class="mode-opt" onclick="app.setMode('hard')" id="m-hard">
                     HARD
-                    <div class="mode-desc">1-30 / 7 Cards<br>Full Adv. Math</div>
+                    <div class="mode-desc">1-30 / 50 Cards<br>Full Adv. Math</div>
                 </div>
             </div>
 
@@ -224,6 +234,7 @@
                 <button class="key func" onclick="game.push('Math.sqrt(')">√</button>
                 <button class="key func" onclick="game.push('Math.abs(')">ABS</button>
                 <button class="key func" onclick="game.push('Math.floor(')">FLR</button>
+                
                 <button class="key func hard-only" onclick="game.push('%')">MOD</button>
                 <button class="key func hard-only" onclick="game.push('~')">NOT</button>
 
@@ -291,8 +302,8 @@
 
     // --- GAME ENGINE ---
     const MODES = {
-        easy: { deck: 40, field: 5, min: 0, max: 9 },
-        hard: { deck: 40, field: 7, min: 1, max: 30 }
+        easy: { deck: 20, field: 5, min: 0, max: 9 }, // Easy: 20 cards
+        hard: { deck: 50, field: 7, min: 1, max: 30 } // Hard: 50 cards
     };
 
     window.app = {
@@ -342,12 +353,14 @@
             document.getElementById('s-game').classList.add('active');
             
             const fieldEl = document.getElementById('field');
+            const keypadEl = document.getElementById('keypad');
+            
             if(mode==='hard') {
                 fieldEl.classList.add('hard');
-                document.getElementById('keypad').classList.add('hard-mode');
+                keypadEl.classList.add('hard-mode');
             } else {
                 fieldEl.classList.remove('hard');
-                document.getElementById('keypad').classList.remove('hard-mode');
+                keypadEl.classList.remove('hard-mode');
             }
 
             this.input = [];
@@ -519,7 +532,6 @@
 
         loadRanking() {
             if(!db) return;
-            // 7名まで取得
             db.collection("make10_scores_final").orderBy("time", "asc").limit(7).get().then(snap => {
                 let html = '';
                 let rank = 1;
