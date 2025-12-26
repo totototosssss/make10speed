@@ -18,7 +18,7 @@
             --border: #d2d2d7;
             --danger: #ff3b30;
             --success: #34c759;
-            --prime: #af52de; /* Purple for Prime */
+            --prime: #af52de;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             
             --gold: #FFD700;
@@ -50,11 +50,23 @@
 
         h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; text-align: center; }
         .label { font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
-        .rule-desc { text-align: center; color: var(--sub-text); font-size: 13px; margin-bottom: 32px; line-height: 1.6; }
+        
+        .rule-container { margin-bottom: 24px; }
+        .rule-desc { text-align: center; color: var(--sub-text); font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
+        
+        details {
+            font-size: 12px; color: var(--sub-text); text-align: left;
+            background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee;
+        }
+        summary { cursor: pointer; font-weight: 600; color: var(--accent); outline: none; margin-bottom: 4px; }
+        .rule-list { margin: 4px 0 0 16px; padding: 0; line-height: 1.6; }
+        .rule-list li { margin-bottom: 4px; }
+        strong { color: var(--text); }
 
         input {
             width: 100%; padding: 14px; font-size: 18px; border: 1px solid var(--border);
-            border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px; background: #fbfbfd;
+            border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px;
+            background: #fbfbfd;
         }
         input:focus { border-color: var(--accent); background: #fff; }
 
@@ -73,7 +85,6 @@
         .mode-opt.selected { border-color: var(--accent); background: #f0f8ff; color: var(--accent); font-weight: 600; }
         .mode-desc { font-size: 11px; color: var(--sub-text); margin-top: 4px; }
 
-        /* Game Header */
         .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid #f5f5f7; margin-bottom: 16px; }
         .stat-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
         .badge-area { font-size: 11px; font-weight: 700; height: 16px; display: flex; gap: 5px; justify-content: flex-end;}
@@ -81,7 +92,6 @@
         .bonus-badge { color: var(--success); display: none; }
         .show { display: inline; animation: flash 1s; }
 
-        /* Formula & Prime Switch */
         .formula-container { margin-bottom: 16px; position: relative; }
         .formula-box {
             height: 64px; background: #f5f5f7; border-radius: 12px;
@@ -91,36 +101,10 @@
         }
         .formula-box.error { border-color: var(--danger); color: var(--danger); }
         .formula-box.success { border-color: var(--success); color: var(--success); background: #eaffef; }
-        
-        /* Prime Mode Styling */
-        .formula-box.prime-active { border-color: var(--prime); background: #fcf5ff; color: var(--prime); }
-        .formula-box.prime-active.success { background: #fcf5ff; color: var(--prime); border-color: var(--prime); }
+        .formula-box.prime-success { border-color: var(--prime); color: var(--prime); background: #fcf5ff; }
 
-        /* Prime Toggle Bar */
-        .prime-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 8px; padding: 0 4px;
-        }
-        .prime-switch {
-            display: flex; align-items: center; gap: 8px; cursor: pointer;
-            font-size: 12px; font-weight: 600; color: var(--sub-text);
-        }
-        .toggle-ui {
-            width: 36px; height: 20px; background: #e5e5ea; border-radius: 20px; position: relative; transition: 0.3s;
-        }
-        .toggle-dot {
-            width: 16px; height: 16px; background: #fff; border-radius: 50%;
-            position: absolute; top: 2px; left: 2px; transition: 0.3s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        /* Active State */
-        .prime-switch.active .toggle-ui { background: var(--prime); }
-        .prime-switch.active .toggle-dot { transform: translateX(16px); }
-        .prime-switch.active { color: var(--prime); }
-        
-        .prime-target { font-size: 11px; color: var(--sub-text); font-variant-numeric: tabular-nums; }
+        .prime-info { display: flex; justify-content: flex-end; font-size: 11px; color: var(--sub-text); margin-top: 4px; padding-right: 4px; }
 
-        /* Field */
         .field {
             display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
             align-content: flex-start; margin-bottom: auto; min-height: 120px;
@@ -136,7 +120,6 @@
         .card.selected { background: var(--text); color: #fff; border-color: var(--text); transform: translateY(-4px); }
         .card.empty { visibility: hidden; pointer-events: none; }
 
-        /* Controls */
         .controls { background: #f5f5f7; border-radius: 16px; padding: 12px; }
         .sub-actions { display: flex; gap: 8px; margin-bottom: 12px; }
         .btn-sub {
@@ -156,32 +139,23 @@
         .key:active { background: #e5e5ea; }
         .key.op { color: var(--accent); font-weight: 600; }
         .key.func { font-size: 11px; font-weight: 700; color: var(--sub-text); }
-        .key.enter { grid-column: span 2; background: var(--accent); color: #fff; border: none; font-weight: 600; }
+        .key.enter { grid-column: span 3; background: var(--accent); color: #fff; border: none; font-weight: 600; }
+        .key.prime { grid-column: span 2; background: var(--prime); color: #fff; border: none; font-weight: 600; font-size: 14px; }
         .key.del { color: var(--danger); }
 
-        /* Result & Ranking */
         .rank-list {
             margin-top: 24px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
             max-height: 250px; overflow-y: auto; background: #fff;
         }
-        .rank-row {
-            display: flex; align-items: center; padding: 12px 16px; 
-            border-bottom: 1px solid #f5f5f7; font-size: 14px;
-        }
+        .rank-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f5f5f7; font-size: 14px; }
         .rank-row:last-child { border-bottom: none; }
-        
-        /* New Ranking Layout */
         .rank-left { display: flex; align-items: center; flex: 1; overflow: hidden; margin-right: 12px; }
         .rank-right { font-weight: 700; white-space: nowrap; }
-        .rank-name {
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;
-        }
-
+        .rank-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         .rank-1, .rank-2, .rank-3 { font-weight: 600; }
         .rank-1 { background-color: #fffae6; }
         .rank-2 { background-color: #f8f8f8; }
         .rank-3 { background-color: #fff4e6; }
-        
         .rank-icon { display: inline-block; width: 20px; text-align: center; margin-right: 6px; flex-shrink: 0; }
         .rank-num { color: var(--sub-text); font-weight: 600; }
 
@@ -200,11 +174,21 @@
     <div id="s-login" class="screen active">
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
             <h1>Make10 Speed</h1>
-            <p class="rule-desc">
-                カードと演算子を組み合わせて「10」を作ってください。<br>
-                全てのカードを使い切ればクリアです。<br>
-                素数チャレンジや全使用ボーナスも活用しましょう。
-            </p>
+            <div class="rule-container">
+                <p class="rule-desc">
+                    計算してカードを全て消せばクリア。<br>
+                    「10」または「素数」を作ってください。
+                </p>
+                <details>
+                    <summary>▼ 詳細ルール / ペナルティ</summary>
+                    <ul class="rule-list">
+                        <li><strong>目標: 10</strong><br>計算結果が10になればカードが消えます。<br>場にあるカードを全て一度に使うと <strong>-10秒ボーナス</strong>。</li>
+                        <li><strong>素数チャレンジ</strong><br>「PRIME !!」ボタンで実行。<br>前回より大きい素数を作ると成功。<br>報酬: <strong>-5秒ボーナス</strong> (10億以下)</li>
+                        <li><strong>PASS (パス)</strong><br>場のカードを入れ替えます。<br>ペナルティ: <strong>+5秒</strong></li>
+                        <li><strong>RETIRE (リタイア)</strong><br>ペナルティ: 残り枚数 × <strong>12秒(Easy)/30秒(Hard)</strong></li>
+                    </ul>
+                </details>
+            </div>
             
             <span class="label">PLAYER NAME</span>
             <input type="text" id="username" placeholder="Name" maxlength="10">
@@ -243,13 +227,7 @@
 
         <div class="formula-container">
             <div id="formula" class="formula-box"></div>
-            <div class="prime-bar">
-                <div class="prime-switch" onclick="game.togglePrime()" id="prime-sw">
-                    <div class="toggle-ui"><div class="toggle-dot"></div></div>
-                    <span>PRIME MODE</span>
-                </div>
-                <div class="prime-target">Target: > <span id="last-prime">0</span></div>
-            </div>
+            <div class="prime-info">Next Prime > <span id="last-prime">0</span></div>
         </div>
 
         <div id="field" class="field"></div>
@@ -285,7 +263,8 @@
                 <button class="key" onclick="game.clear()">CLR</button>
                 <button class="key" onclick="game.push('.')">.</button>
 
-                <button class="key enter" style="grid-column:1/-1" onclick="game.submit()">ENTER</button>
+                <button class="key enter" onclick="game.submit('normal')">ENTER (10)</button>
+                <button class="key prime" onclick="game.submit('prime')">PRIME !!</button>
             </div>
         </div>
     </div>
@@ -319,7 +298,6 @@
 </div>
 
 <script>
-    // --- FIREBASE INIT ---
     const firebaseConfig = {
         apiKey: "AIzaSyCrhya7vth8ecxzd7TZA7jQIwYrKsZq7_0",
         authDomain: "make10speed.firebaseapp.com",
@@ -335,11 +313,11 @@
         db = firebase.firestore();
     } catch(e) { console.warn("Offline"); }
 
-    // --- GAME ENGINE ---
     const MODES = {
         easy: { deck: 20, field: 5, min: 0, max: 9 },
         hard: { deck: 50, field: 7, min: 1, max: 30 }
     };
+    const MAX_PRIME_CHECK = 1000000000; // 1 Billion
 
     window.app = {
         mode: 'easy',
@@ -366,9 +344,6 @@
         bonusTime: 0,
         timer: null,
         active: false,
-        
-        // Prime Challenge
-        isPrimeMode: false,
         lastPrime: 0,
 
         init(user, mode) {
@@ -376,24 +351,20 @@
             this.mode = mode;
             this.conf = MODES[mode];
             
-            // Deck
             this.deck = [];
             const range = this.conf.max - this.conf.min + 1;
             for(let i=0; i<this.conf.deck; i++) {
                 this.deck.push(Math.floor(Math.random()*range) + this.conf.min);
             }
 
-            // Field
             this.field = new Array(this.conf.field).fill(null);
             this.fillField();
 
-            // UI
             document.getElementById('s-login').classList.remove('active');
             document.getElementById('s-game').classList.add('active');
             
             const fieldEl = document.getElementById('field');
             const keypadEl = document.getElementById('keypad');
-            
             if(mode==='hard') {
                 fieldEl.classList.add('hard');
                 keypadEl.classList.add('hard-mode');
@@ -407,11 +378,8 @@
             this.bonusTime = 0;
             this.active = true;
             this.startTime = Date.now();
-            
-            // Prime Init
-            this.isPrimeMode = false;
             this.lastPrime = 0;
-            this.updatePrimeUI();
+            document.getElementById('last-prime').innerText = 0;
             
             this.render();
             
@@ -446,10 +414,7 @@
             document.getElementById('deck-disp').innerText = this.deck.length;
             const fBox = document.getElementById('formula');
             fBox.innerText = this.input.map(i => i.val).join(' ');
-            // class update
-            let cls = 'formula-box';
-            if(this.isPrimeMode) cls += ' prime-active';
-            fBox.className = cls;
+            fBox.className = 'formula-box'; // reset
 
             const container = document.getElementById('field');
             container.innerHTML = '';
@@ -479,43 +444,34 @@
         pop() { if(this.active) { this.input.pop(); this.render(); } },
         clear() { if(this.active) { this.input = []; this.render(); } },
 
-        // --- Prime Mode ---
-        togglePrime() {
-            this.isPrimeMode = !this.isPrimeMode;
-            this.updatePrimeUI();
-            this.render();
-        },
-        updatePrimeUI() {
-            const sw = document.getElementById('prime-sw');
-            if(this.isPrimeMode) sw.classList.add('active');
-            else sw.classList.remove('active');
-            document.getElementById('last-prime').innerText = this.lastPrime;
-        },
         isPrimeCheck(n) {
+            if(n > MAX_PRIME_CHECK) return false;
             if (n < 2 || !Number.isInteger(n)) return false;
-            for (let i = 2; i <= Math.sqrt(n); i++) {
+            if (n === 2) return true;
+            if (n % 2 === 0) return false;
+            const limit = Math.sqrt(n);
+            for (let i = 3; i <= limit; i += 2) {
                 if (n % i === 0) return false;
             }
             return true;
         },
 
-        submit() {
+        submit(type) {
             if(!this.active || this.input.length===0) return;
             const expr = this.input.map(i => i.val).join('');
             try {
                 if(/[^0-9+\-*/().Mathsqrtfloorabs%&|^~<>\s]/g.test(expr)) throw new Error("Inv");
                 const res = Function('"use strict";return (' + expr + ')')();
                 
-                // Logic Branch
-                if(this.isPrimeMode) {
-                    // Prime Challenge Rule
+                if(res > MAX_PRIME_CHECK) throw new Error("Too Big");
+
+                if(type === 'prime') {
                     if(this.isPrimeCheck(res) && res > this.lastPrime) {
                         this.successPrime(res);
                     } else {
                         this.fail();
                     }
                 } else {
-                    // Make 10 Rule
                     if(Math.abs(res - 10) < 0.00001) {
                         this.success();
                     } else {
@@ -526,26 +482,20 @@
         },
 
         success() {
-            // Standard Make 10 Success
-            this.flashSuccess("-10s BONUS!");
-            this.processSuccess(0); // 0 bonus unless perfect
+            this.flashSuccess('success', "-10s BONUS!");
+            this.processSuccess(0);
         },
 
         successPrime(newPrime) {
-            // Prime Challenge Success
             this.lastPrime = newPrime;
-            this.updatePrimeUI();
-            this.flashSuccess("-5s PRIME!");
-            this.processSuccess(5); // 5s Bonus
+            document.getElementById('last-prime').innerText = newPrime;
+            this.flashSuccess('prime-success', "-5s PRIME!");
+            this.processSuccess(5);
         },
         
-        flashSuccess(msg) {
+        flashSuccess(cls, msg) {
             const fb = document.getElementById('formula');
-            fb.classList.add('success');
-            
-            // Check Perfect Bonus logic is inside processSuccess for flexibility
-            // But we display badge text dynamically? 
-            // Reuse bonus-badge text
+            fb.classList.add(cls);
             const badge = document.getElementById('bonus-badge');
             badge.innerText = msg;
             badge.classList.remove('show');
@@ -558,12 +508,8 @@
             const activeCardsCount = this.field.filter(x => x !== null).length;
             
             let totalBonus = baseBonus;
-
-            // Perfect Clear Bonus (Only if normal mode OR prime mode? Rule says "Using all cards... bonus -10s")
-            // Let's apply perfect bonus regardless of mode
             if (usedIds.length === activeCardsCount && usedIds.length > 1) {
                 totalBonus += 10;
-                // Override badge text if perfect happened
                 const badge = document.getElementById('bonus-badge');
                 badge.innerText = "PERFECT! -" + totalBonus + "s";
                 badge.classList.remove('show');
@@ -613,11 +559,8 @@
         retire() {
             if(!this.active || !confirm("Give up?")) return;
             const rem = this.deck.length + this.field.filter(x=>x).length;
-            
-            // Penalty: Hard=30s per card, Easy=12s per card
             const penPerCard = this.mode === 'hard' ? 30 : 12;
             this.penTime += (rem * penPerCard);
-            
             this.finish("RETIRED");
         },
 
