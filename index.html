@@ -3,356 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Make10 Speed</title>
+    <title>Make10: Clean</title>
     
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
-            --bg-color: #F5F5F7;
-            --card-bg: #FFFFFF;
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --accent: #0071E3;
-            --accent-hover: #0077ED;
-            --danger: #FF3B30;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 8px 16px rgba(0,0,0,0.08);
-            --radius-md: 12px;
-            --radius-lg: 18px;
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg: #F5F5F7;
+            --surface: #FFFFFF;
+            --text: #1d1d1f;
+            --sub-text: #86868b;
+            --accent: #0071e3;
+            --border: #d2d2d7;
+            --danger: #ff3b30;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
+
+        * { box-sizing: border-box; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: var(--font-stack);
-            height: 100vh;
+            background-color: var(--bg); color: var(--text); font-family: var(--font);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
             display: flex; justify-content: center;
-            overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        .view {
-            display: none; flex-direction: column; width: 100%; max-width: 480px; height: 100%;
-            padding: 20px; box-sizing: border-box; opacity: 0; transition: opacity 0.3s ease;
+        #app {
+            width: 100%; max-width: 500px; height: 100%; position: relative;
+            background: var(--surface); display: flex; flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
-        .view.active { display: flex; opacity: 1; }
+        @media(min-width: 500px) { #app { height: 95vh; margin-top: 2.5vh; border-radius: 18px; border: 1px solid #e5e5ea; overflow: hidden; } }
 
-        h1 { font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 40px; }
-
-        .input-group { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: auto; }
-        input { width: 100%; padding: 16px; font-size: 18px; border: 1px solid #d2d2d7; border-radius: var(--radius-md); text-align: center; outline: none; }
-        input:focus { border-color: var(--accent); }
-
-        button.primary-btn {
-            background-color: var(--text-primary); color: #fff; border: none; padding: 16px 32px;
-            font-size: 17px; font-weight: 600; border-radius: 28px; cursor: pointer; width: 100%;
+        /* Screens */
+        .screen {
+            position: absolute; inset: 0; padding: 24px;
+            display: flex; flex-direction: column;
+            background: var(--surface); opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
-        button.primary-btn:active { transform: scale(0.98); opacity: 0.9; }
+        .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .status-pill { background: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-sm); color: var(--text-secondary); }
-        .timer { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text-primary); }
+        /* Typography */
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; text-align: center; }
+        .label { font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
+        
+        /* Inputs */
+        input {
+            width: 100%; padding: 14px; font-size: 18px; border: 1px solid var(--border);
+            border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px;
+            background: #fbfbfd;
+        }
+        input:focus { border-color: var(--accent); background: #fff; }
 
-        .formula-display {
-            background: #fff; border-radius: var(--radius-md); height: 70px;
+        /* Buttons */
+        .btn {
+            border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600;
+            cursor: pointer; width: 100%; transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn:active { transform: scale(0.98); opacity: 0.8; }
+        .btn-primary { background: var(--text); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-danger { color: var(--danger); border-color: var(--danger); }
+
+        /* Mode Select */
+        .mode-group { display: flex; gap: 12px; margin-bottom: 30px; }
+        .mode-opt {
+            flex: 1; padding: 16px; border: 1px solid var(--border); border-radius: 10px;
+            text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .mode-opt.selected { border-color: var(--accent); background: #f0f8ff; color: var(--accent); font-weight: 600; }
+        .mode-desc { font-size: 11px; color: var(--sub-text); margin-top: 4px; }
+
+        /* Game Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid #f5f5f7; margin-bottom: 16px; }
+        .stat-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .penalty-badge { color: var(--danger); font-size: 11px; font-weight: 700; display: none; }
+        .penalty-badge.show { display: inline; }
+
+        /* Formula */
+        .formula-box {
+            height: 64px; background: #f5f5f7; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px; font-weight: 500; margin-bottom: 24px;
-            box-shadow: var(--shadow-sm); transition: color 0.2s;
+            font-size: 26px; font-weight: 500; margin-bottom: 16px;
+            border: 2px solid transparent;
         }
-        .formula-display.error { color: var(--danger); animation: shake 0.4s; }
+        .formula-box.error { border-color: var(--danger); color: var(--danger); }
+        .formula-box.success { border-color: #34c759; color: #34c759; background: #eaffef; }
 
-        /* --- Updated Card Grid for 5 items --- */
-        .card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            align-content: center;
+        /* Card Field */
+        .field {
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+            align-content: flex-start; margin-bottom: auto; min-height: 120px;
         }
         .card {
-            background: var(--card-bg);
-            border-radius: var(--radius-md);
+            background: #fff; border: 1px solid var(--border); border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 36px; font-weight: 600;
-            box-shadow: var(--shadow-sm); cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            position: relative;
-            /* Layout: Roughly 3 per row on small screens, ensuring 5 look good */
-            width: calc(33% - 12px); 
-            aspect-ratio: 3/4;
+            font-size: 24px; font-weight: 600; cursor: pointer;
+            width: calc(20% - 7px); aspect-ratio: 0.8;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative;
         }
-        .card:active { transform: scale(0.95); }
-        .card.selected { background: var(--text-primary); color: #fff; box-shadow: var(--shadow-md); transform: translateY(-4px); }
+        /* Hard Mode (7 cards) styling */
+        .field.hard .card { width: calc(14.2% - 7px); font-size: 20px; }
+        
+        .card.selected { background: var(--text); color: #fff; border-color: var(--text); transform: translateY(-4px); }
         .card.empty { visibility: hidden; pointer-events: none; }
-        
-        .controls { background: #fff; border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-md); margin-top: auto; }
-        .ops-row { display: flex; justify-content: space-between; margin-bottom: 16px; }
-        .op-btn { width: 44px; height: 44px; background: #f5f5f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
-        .op-btn:active { background: #e5e5e5; }
-        
-        .action-row { display: flex; gap: 12px; }
-        .act-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 600; font-size: 15px; cursor: pointer; }
-        .btn-clear { background: #f5f5f7; color: var(--text-secondary); }
-        .btn-go { background: var(--accent); color: #fff; }
 
-        .ranking-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .ranking-table th, .ranking-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f5f5f7; }
-        .ranking-table th { background: #fafafa; font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+        /* Controls */
+        .controls { background: #f5f5f7; border-radius: 16px; padding: 12px; }
         
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+        .sub-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn-sub {
+            flex: 1; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 8px;
+            border: 1px solid #e5e5ea; background: #fff; color: var(--sub-text); cursor: pointer;
+        }
+        
+        .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .key {
+            height: 44px; background: #fff; border: 1px solid #e5e5ea; border-radius: 8px;
+            font-size: 16px; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .key:active { background: #e5e5ea; }
+        .key.op { color: var(--accent); font-weight: 600; }
+        .key.func { font-size: 11px; font-weight: 700; color: var(--sub-text); }
+        .key.enter { grid-column: span 2; background: var(--accent); color: #fff; border: none; font-weight: 600; }
+        .key.del { color: var(--danger); }
+
+        /* Result */
+        .rank-list {
+            margin-top: 24px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
+            max-height: 250px; overflow-y: auto; background: #fff;
+        }
+        .rank-row {
+            display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f5f5f7; font-size: 13px;
+        }
+        .rank-row:last-child { border-bottom: none; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 6px; }
+        .badge-easy { background: #e3f2fd; color: var(--accent); }
+        .badge-hard { background: #ffebee; color: var(--danger); }
+
+        /* Result Info */
+        .res-info {
+            display: flex; justify-content: space-between; width: 100%;
+            border-bottom: 1px solid #e5e5ea; padding-bottom: 12px; margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="view-login" class="view active">
-        <h1>Make10 Speed</h1>
-        <div class="input-group">
-            <input type="text" id="username" placeholder="Player Name" maxlength="12">
-            <button class="primary-btn" onclick="app.start()">Start Game</button>
+<div id="app">
+    <div id="s-login" class="screen active">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+            <h1>Make10 Speed</h1>
+            <p style="text-align:center; color:var(--sub-text); font-size:14px; margin-bottom:32px;">Logic & Reflexes</p>
+            
+            <span class="label">PLAYER NAME</span>
+            <input type="text" id="username" placeholder="Name" maxlength="10">
+            
+            <span class="label">MODE SELECT</span>
+            <div class="mode-group">
+                <div class="mode-opt selected" onclick="app.setMode('easy')" id="m-easy">
+                    EASY
+                    <div class="mode-desc">0-9 / 5 Cards</div>
+                </div>
+                <div class="mode-opt" onclick="app.setMode('hard')" id="m-hard">
+                    HARD
+                    <div class="mode-desc">1-30 / 7 Cards</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="app.start()">START GAME</button>
         </div>
     </div>
 
-    <div id="view-game" class="view">
-        <div class="game-header">
-            <div class="status-pill">In Deck: <span id="deck-count">40</span></div>
-            <div class="status-pill timer" id="timer">0.00s</div>
+    <div id="s-game" class="screen">
+        <div class="header">
+            <div>
+                <span class="label">REMAINING</span>
+                <div class="stat-val" id="deck-disp">0</div>
+            </div>
+            <div style="text-align:right;">
+                <span class="label">TIME <span id="pen-badge" class="penalty-badge">+PENALTY</span></span>
+                <div class="stat-val" id="timer">0.00</div>
+            </div>
         </div>
 
-        <div id="formula" class="formula-display"></div>
+        <div id="formula" class="formula-box"></div>
 
-        <div id="grid" class="card-grid">
+        <div id="field" class="field">
             </div>
 
         <div class="controls">
-            <div class="ops-row">
-                <div class="op-btn" onclick="game.addOp('+')">+</div>
-                <div class="op-btn" onclick="game.addOp('-')">&minus;</div>
-                <div class="op-btn" onclick="game.addOp('*')">&times;</div>
-                <div class="op-btn" onclick="game.addOp('/')">&divide;</div>
-                <div class="op-btn" onclick="game.addOp('(')">(</div>
-                <div class="op-btn" onclick="game.addOp(')')">)</div>
+            <div class="sub-actions">
+                <button class="btn-sub" onclick="game.pass()">PASS (+20s)</button>
+                <button class="btn-sub" style="color:var(--danger)" onclick="game.retire()">RETIRE (Give Up)</button>
             </div>
-            <div class="action-row">
-                <button class="act-btn btn-clear" onclick="game.clear()">Clear</button>
-                <button class="act-btn btn-go" onclick="game.submit()">Enter</button>
+            <div class="keypad">
+                <button class="key func" onclick="game.push('Math.sqrt(')">√</button>
+                <button class="key func" onclick="game.push('Math.abs(')">ABS</button>
+                <button class="key func" onclick="game.push('Math.floor(')">FLR</button>
+                <button class="key func" onclick="game.push('^')">XOR</button>
+                <button class="key func" onclick="game.push('&')">AND</button>
+
+                <button class="key op" onclick="game.push('+')">+</button>
+                <button class="key op" onclick="game.push('-')">&minus;</button>
+                <button class="key op" onclick="game.push('*')">&times;</button>
+                <button class="key op" onclick="game.push('/')">&divide;</button>
+                <button class="key func" onclick="game.push('**')">POW</button>
+
+                <button class="key op" onclick="game.push('(')">(</button>
+                <button class="key op" onclick="game.push(')')">)</button>
+                <button class="key del" onclick="game.pop()">DEL</button>
+                <button class="key" onclick="game.clear()">CLR</button>
+                <button class="key func" onclick="game.push('|')">OR</button>
+
+                <button class="key func" onclick="game.push('%')">MOD</button>
+                <button class="key func" onclick="game.push('~')">NOT</button>
+                <button class="key" onclick="game.push('.')">.</button>
+                <button class="key enter" onclick="game.submit()">ENTER</button>
             </div>
         </div>
     </div>
 
-    <div id="view-result" class="view">
-        <h1>Finished</h1>
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="font-size: 14px; color: var(--text-secondary);">FINAL TIME</div>
-            <div style="font-size: 48px; font-weight: 700; color: var(--text-primary);" id="result-time">0.00s</div>
+    <div id="s-result" class="screen">
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; padding-top:20px;">
+            <h1 id="res-title">FINISHED</h1>
+            
+            <div class="res-info">
+                <div>
+                    <span class="label">MODE</span>
+                    <div style="font-weight:600;" id="res-mode">EASY</div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="label">FINAL TIME</span>
+                    <div style="font-weight:700; font-size:24px; color:var(--accent);" id="res-time">0.00s</div>
+                </div>
+            </div>
+
+            <div style="width:100%; font-size:12px; color:var(--sub-text); margin-bottom:20px;">
+                Penalty Added: <span id="res-pen">0</span>s
+            </div>
+
+            <span class="label" style="width:100%">GLOBAL RANKING</span>
+            <div id="ranking" class="rank-list">Loading...</div>
+            
+            <button class="btn btn-primary" style="margin-top:auto;" onclick="location.reload()">PLAY AGAIN</button>
         </div>
-        <div id="ranking-container">Loading...</div>
-        <button class="primary-btn" style="margin-top: 30px;" onclick="location.reload()">Play Again</button>
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+<script>
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyCrhya7vth8ecxzd7TZA7jQIwYrKsZq7_0",
+        authDomain: "make10speed.firebaseapp.com",
+        projectId: "make10speed",
+        storageBucket: "make10speed.firebasestorage.app",
+        messagingSenderId: "422015463278",
+        appId: "1:422015463278:web:df7d98641c2adf6d915b7f",
+        measurementId: "G-7XLB8CVG6D"
+    };
+    let db = null;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch(e) { console.warn("Offline"); }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCrhya7vth8ecxzd7TZA7jQIwYrKsZq7_0",
-            authDomain: "make10speed.firebaseapp.com",
-            projectId: "make10speed",
-            storageBucket: "make10speed.firebasestorage.app",
-            messagingSenderId: "422015463278",
-            appId: "1:422015463278:web:df7d98641c2adf6d915b7f",
-            measurementId: "G-7XLB8CVG6D"
-        };
+    // --- GAME ENGINE ---
+    const MODES = {
+        easy: { deck: 40, field: 5, min: 0, max: 9 },
+        hard: { deck: 40, field: 7, min: 1, max: 30 }
+    };
 
-        const fApp = initializeApp(firebaseConfig);
-        const db = getFirestore(fApp);
+    window.app = {
+        mode: 'easy',
+        setMode(m) {
+            this.mode = m;
+            document.querySelectorAll('.mode-opt').forEach(el => el.classList.remove('selected'));
+            document.getElementById('m-'+m).classList.add('selected');
+        },
+        start() {
+            const u = document.getElementById('username').value.trim() || "Guest";
+            game.init(u, this.mode);
+        }
+    };
 
-        // --- CONFIG ---
-        const CONFIG = {
-            deckSize: 40, 
-            fieldSize: 5, // ★★★ ここを5に変更しました ★★★
-            target: 10
-        };
+    window.game = {
+        user: '',
+        mode: '',
+        conf: {},
+        deck: [],
+        field: [],
+        input: [],
+        startTime: 0,
+        penTime: 0,
+        timer: null,
+        active: false,
 
-        let state = {
-            user: '',
-            deck: [],
-            field: [],
-            selection: [],
-            startTime: 0,
-            timerInterval: null,
-            isGameOver: false
-        };
-
-        window.app = {
-            start: () => {
-                const name = document.getElementById('username').value.trim() || 'Guest';
-                state.user = name;
-                document.getElementById('view-login').classList.remove('active');
-                document.getElementById('view-game').classList.add('active');
-                game.init();
+        init(user, mode) {
+            this.user = user;
+            this.mode = mode;
+            this.conf = MODES[mode];
+            
+            // Setup Deck
+            this.deck = [];
+            const range = this.conf.max - this.conf.min + 1;
+            for(let i=0; i<this.conf.deck; i++) {
+                this.deck.push(Math.floor(Math.random()*range) + this.conf.min);
             }
-        };
 
-        window.game = {
-            init: () => {
-                state.deck = [];
-                for(let i=0; i < CONFIG.deckSize; i++) {
-                    state.deck.push(Math.floor(Math.random() * 10));
-                }
+            // Setup Field
+            this.field = new Array(this.conf.field).fill(null);
+            this.fillField();
+
+            // Switch Screen
+            document.getElementById('s-login').classList.remove('active');
+            document.getElementById('s-game').classList.add('active');
+            
+            const fieldEl = document.getElementById('field');
+            if(mode==='hard') fieldEl.classList.add('hard');
+            else fieldEl.classList.remove('hard');
+
+            this.input = [];
+            this.penTime = 0;
+            this.active = true;
+            this.startTime = Date.now();
+            
+            this.render();
+            
+            // Loop
+            if(this.timer) clearInterval(this.timer);
+            this.timer = setInterval(() => {
+                if(!this.active) return;
+                const now = (Date.now() - this.startTime)/1000;
+                document.getElementById('timer').innerText = (now + this.penTime).toFixed(2);
                 
-                state.field = new Array(CONFIG.fieldSize).fill(null);
-                
-                // Fill initially
-                for(let i=0; i < CONFIG.fieldSize; i++) {
-                    if(state.deck.length > 0) {
-                        state.field[i] = {
-                            id: `card-${i}-${Date.now()}`,
-                            val: state.deck.pop()
+                // Show penalty badge
+                const badge = document.getElementById('pen-badge');
+                if(this.penTime > 0) badge.classList.add('show');
+            }, 50);
+        },
+
+        fillField() {
+            const range = this.conf.max - this.conf.min + 1;
+            for(let i=0; i<this.field.length; i++) {
+                if(!this.field[i]) {
+                    if(this.deck.length > 0) {
+                        this.field[i] = {
+                            id: Math.random().toString(36),
+                            val: this.deck.pop()
                         };
                     }
                 }
-
-                state.selection = [];
-                state.startTime = Date.now();
-                state.isGameOver = false;
-
-                this.renderField();
-                this.updateUI();
-                
-                clearInterval(state.timerInterval);
-                state.timerInterval = setInterval(this.tick, 31);
-            },
-
-            tick: () => {
-                if(state.isGameOver) return;
-                const diff = (Date.now() - state.startTime) / 1000;
-                document.getElementById('timer').innerText = diff.toFixed(2) + 's';
-            },
-
-            renderField: () => {
-                const grid = document.getElementById('grid');
-                grid.innerHTML = '';
-                state.field.forEach((item, index) => {
-                    const el = document.createElement('div');
-                    if (item === null) {
-                        el.className = 'card empty';
-                    } else {
-                        el.className = 'card';
-                        el.innerText = item.val;
-                        const isSelected = state.selection.some(t => t.type === 'num' && t.refId === item.id);
-                        if(isSelected) el.classList.add('selected');
-                        el.onclick = () => window.game.tapCard(index);
-                    }
-                    grid.appendChild(el);
-                });
-            },
-
-            tapCard: (index) => {
-                const item = state.field[index];
-                if(!item) return;
-                if(state.selection.some(t => t.type === 'num' && t.refId === item.id)) return;
-                state.selection.push({ type: 'num', val: item.val, refId: item.id });
-                this.updateFormula();
-                this.renderField();
-            },
-
-            addOp: (op) => {
-                state.selection.push({ type: 'op', val: op });
-                this.updateFormula();
-            },
-
-            clear: () => {
-                state.selection = [];
-                this.updateFormula();
-                this.renderField();
-            },
-
-            updateFormula: () => {
-                document.getElementById('formula').innerText = state.selection.map(t => t.val).join(' ');
-                document.getElementById('formula').classList.remove('error');
-            },
-
-            updateUI: () => {
-                document.getElementById('deck-count').innerText = state.deck.length;
-            },
-
-            submit: () => {
-                if(state.selection.length === 0) return;
-                const str = state.selection.map(t => t.val).join('');
-                try {
-                    if(/[^0-9+\-*/().]/.test(str)) throw new Error("Invalid");
-                    const res = Function('"use strict";return (' + str + ')')();
-                    if(Math.abs(res - CONFIG.target) < 0.00001) {
-                        this.handleSuccess();
-                    } else {
-                        this.handleError();
-                    }
-                } catch(e) { this.handleError(); }
-            },
-
-            handleSuccess: () => {
-                const usedIds = state.selection.filter(t => t.type === 'num').map(t => t.refId);
-                
-                // Refill Logic
-                state.field = state.field.map(item => {
-                    if(item && usedIds.includes(item.id)) {
-                        return state.deck.length > 0 ? { id: `card-${Math.random()}`, val: state.deck.pop() } : null;
-                    }
-                    return item;
-                });
-
-                state.selection = [];
-                this.updateFormula();
-                this.renderField();
-                this.updateUI();
-
-                const remaining = state.deck.length + state.field.filter(x => x !== null).length;
-                if(remaining === 0) this.gameOver();
-            },
-
-            handleError: () => {
-                const d = document.getElementById('formula');
-                d.classList.add('error');
-                setTimeout(() => d.classList.remove('error'), 400);
-            },
-
-            gameOver: async () => {
-                state.isGameOver = true;
-                clearInterval(state.timerInterval);
-                const time = (Date.now() - state.startTime) / 1000;
-                document.getElementById('view-game').classList.remove('active');
-                document.getElementById('view-result').classList.add('active');
-                document.getElementById('result-time').innerText = time.toFixed(2) + 's';
-
-                try {
-                    await addDoc(collection(db, "speed_scores_v2"), { // New collection for 5-card mode
-                        name: state.user,
-                        time: time,
-                        date: new Date()
-                    });
-                    this.loadRanking();
-                } catch(e) { console.error(e); }
-            },
-
-            loadRanking: async () => {
-                const c = document.getElementById('ranking-container');
-                try {
-                    const q = query(collection(db, "speed_scores_v2"), orderBy("time", "asc"), limit(7));
-                    const s = await getDocs(q);
-                    let h = '<table class="ranking-table"><tr><th>Rank</th><th>Name</th><th>Time</th></tr>';
-                    let r = 1;
-                    s.forEach(d => {
-                        const data = d.data();
-                        const b = r <= 3 ? ['🥇','🥈','🥉'][r-1] : r;
-                        h += `<tr><td><span style="font-weight:bold">${b}</span></td><td>${data.name}</td><td>${data.time.toFixed(2)}s</td></tr>`;
-                        r++;
-                    });
-                    h += '</table>';
-                    c.innerHTML = h;
-                } catch(e) { c.innerText = "Ranking Offline"; }
             }
-        };
-    </script>
+        },
+
+        render() {
+            document.getElementById('deck-disp').innerText = this.deck.length;
+            
+            const fBox = document.getElementById('formula');
+            fBox.innerText = this.input.map(i => i.val).join(' ');
+            fBox.className = 'formula-box';
+
+            const container = document.getElementById('field');
+            container.innerHTML = '';
+            this.field.forEach((c, idx) => {
+                const el = document.createElement('div');
+                if(!c) {
+                    el.className = 'card empty';
+                } else {
+                    el.className = 'card';
+                    el.innerText = c.val;
+                    if(this.input.some(i => i.refId === c.id)) el.classList.add('selected');
+                    el.onclick = () => this.tap(idx);
+                }
+                container.appendChild(el);
+            });
+        },
+
+        tap(idx) {
+            if(!this.active) return;
+            const c = this.field[idx];
+            if(!c || this.input.some(i => i.refId === c.id)) return;
+            this.input.push({ type:'num', val:c.val, refId:c.id });
+            this.render();
+        },
+
+        push(v) { if(this.active) { this.input.push({ type:'op', val:v }); this.render(); } },
+        pop() { if(this.active) { this.input.pop(); this.render(); } },
+        clear() { if(this.active) { this.input = []; this.render(); } },
+
+        submit() {
+            if(!this.active || this.input.length===0) return;
+            const expr = this.input.map(i => i.val).join('');
+            try {
+                if(/[^0-9+\-*/().Mathsqrtfloorabs%&|^~]/g.test(expr)) throw new Error("Inv");
+                const res = Function('"use strict";return (' + expr + ')')();
+                
+                if(Math.abs(res - 10) < 0.00001) {
+                    this.success();
+                } else {
+                    this.fail();
+                }
+            } catch(e) { this.fail(); }
+        },
+
+        success() {
+            document.getElementById('formula').classList.add('success');
+            const usedIds = this.input.filter(i => i.type==='num').map(i=>i.refId);
+            
+            for(let i=0; i<this.field.length; i++) {
+                if(this.field[i] && usedIds.includes(this.field[i].id)) this.field[i] = null;
+            }
+            this.fillField();
+            this.input = [];
+            
+            const rem = this.deck.length + this.field.filter(x=>x).length;
+            if(rem === 0) this.finish("FINISHED");
+            else setTimeout(() => this.render(), 100);
+        },
+
+        fail() {
+            const el = document.getElementById('formula');
+            el.classList.add('error');
+            setTimeout(() => el.classList.remove('error'), 300);
+        },
+
+        pass() {
+            if(!this.active || !confirm("Pass & Refresh? (+20s Penalty)")) return;
+            this.penTime += 20;
+            // Reroll current field
+            const range = this.conf.max - this.conf.min + 1;
+            for(let i=0; i<this.field.length; i++) {
+                if(this.field[i]) {
+                    this.field[i].val = Math.floor(Math.random()*range) + this.conf.min;
+                    this.field[i].id = Math.random().toString(36);
+                }
+            }
+            this.input = [];
+            this.render();
+        },
+
+        retire() {
+            if(!this.active || !confirm("Give up?")) return;
+            const rem = this.deck.length + this.field.filter(x=>x).length;
+            this.penTime += (rem * 7);
+            this.finish("RETIRED");
+        },
+
+        finish(status) {
+            this.active = false;
+            clearInterval(this.timer);
+            const timeRaw = (Date.now() - this.startTime)/1000;
+            const finalTime = timeRaw + this.penTime;
+
+            document.getElementById('s-game').classList.remove('active');
+            document.getElementById('s-result').classList.add('active');
+            
+            document.getElementById('res-title').innerText = status;
+            document.getElementById('res-time').innerText = finalTime.toFixed(2) + 's';
+            document.getElementById('res-mode').innerText = this.mode.toUpperCase();
+            document.getElementById('res-pen').innerText = this.penTime;
+            
+            // Save & Load
+            if(db) {
+                db.collection("make10_scores_v4").add({
+                    name: this.user,
+                    mode: this.mode,
+                    time: finalTime,
+                    date: new Date()
+                }).then(() => this.loadRanking());
+            } else {
+                document.getElementById('ranking').innerText = "Offline Mode";
+            }
+        },
+
+        loadRanking() {
+            if(!db) return;
+            // Showing top 20 irrespective of mode, allowing hard/easy comparison
+            // or we could filter. For now, mixed ranking by time.
+            db.collection("make10_scores_v4").orderBy("time", "asc").limit(20).get().then(snap => {
+                let html = '';
+                let rank = 1;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const badgeClass = d.mode === 'hard' ? 'badge-hard' : 'badge-easy';
+                    const modeLabel = d.mode === 'hard' ? 'H' : 'E';
+                    html += `
+                    <div class="rank-row">
+                        <div style="display:flex; align-items:center;">
+                            <span style="width:24px; color:#aaa;">${rank}</span>
+                            <span class="badge ${badgeClass}">${modeLabel}</span>
+                            <span style="font-weight:500;">${d.name}</span>
+                        </div>
+                        <div style="font-weight:700;">${d.time.toFixed(2)}s</div>
+                    </div>`;
+                    rank++;
+                });
+                document.getElementById('ranking').innerHTML = html;
+            });
+        }
+    };
+</script>
 </body>
 </html>
