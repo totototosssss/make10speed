@@ -20,17 +20,16 @@
             --success: #34c759;
             --prime: #af52de;
             --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            
-            --gold: #FFD700;
-            --silver: #C0C0C0;
-            --bronze: #CD7F32;
         }
 
         * { box-sizing: border-box; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg); color: var(--text); font-family: var(--font);
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            margin: 0; padding: 0; 
+            /* スマホのアドレスバー対策: dvhを使用 */
+            height: 100vh; height: 100dvh; 
+            overflow: hidden;
             display: flex; justify-content: center;
         }
 
@@ -39,131 +38,147 @@
             background: var(--surface); display: flex; flex-direction: column;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
-        @media(min-width: 500px) { #app { height: 95vh; margin-top: 2.5vh; border-radius: 18px; border: 1px solid #e5e5ea; overflow: hidden; } }
+        /* PC等の大画面時のみ枠を表示 */
+        @media(min-width: 500px) { 
+            #app { height: 95vh; margin-top: 2.5vh; border-radius: 18px; border: 1px solid #e5e5ea; overflow: hidden; } 
+        }
 
         .screen {
-            position: absolute; inset: 0; padding: 24px;
+            position: absolute; inset: 0; 
+            /* スマホ用にパディングを少し縮小 */
+            padding: 16px; 
             display: flex; flex-direction: column;
             background: var(--surface); opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
         .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; text-align: center; }
-        .label { font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
+        h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; text-align: center; }
+        .label { font-size: 11px; font-weight: 600; color: var(--sub-text); margin-bottom: 4px; display: block; }
         
-        .rule-container { margin-bottom: 24px; }
-        .rule-desc { text-align: center; color: var(--sub-text); font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
+        .rule-container { margin-bottom: 20px; }
+        .rule-desc { text-align: center; color: var(--sub-text); font-size: 12px; line-height: 1.4; margin-bottom: 10px; }
         
         details {
-            font-size: 12px; color: var(--sub-text); text-align: left;
-            background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee;
+            font-size: 11px; color: var(--sub-text); text-align: left;
+            background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee;
         }
-        summary { cursor: pointer; font-weight: 600; color: var(--accent); outline: none; margin-bottom: 4px; }
-        .rule-list { margin: 4px 0 0 16px; padding: 0; line-height: 1.6; }
-        .rule-list li { margin-bottom: 4px; }
-        strong { color: var(--text); }
+        summary { cursor: pointer; font-weight: 600; color: var(--accent); outline: none; margin-bottom: 2px; }
+        .rule-list { margin: 4px 0 0 16px; padding: 0; line-height: 1.5; }
+        .rule-list li { margin-bottom: 2px; }
 
         input {
-            width: 100%; padding: 14px; font-size: 18px; border: 1px solid var(--border);
-            border-radius: 10px; outline: none; text-align: center; margin-bottom: 24px;
+            width: 100%; padding: 12px; font-size: 16px; border: 1px solid var(--border);
+            border-radius: 10px; outline: none; text-align: center; margin-bottom: 20px;
             background: #fbfbfd;
         }
         input:focus { border-color: var(--accent); background: #fff; }
 
         .btn {
-            border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600;
+            border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600;
             cursor: pointer; width: 100%; transition: opacity 0.2s, transform 0.1s;
         }
         .btn:active { transform: scale(0.98); opacity: 0.8; }
         .btn-primary { background: var(--text); color: #fff; }
         
-        .mode-group { display: flex; gap: 12px; margin-bottom: 30px; }
+        .mode-group { display: flex; gap: 10px; margin-bottom: 20px; }
         .mode-opt {
-            flex: 1; padding: 16px; border: 1px solid var(--border); border-radius: 10px;
+            flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
             text-align: center; cursor: pointer; transition: 0.2s;
         }
         .mode-opt.selected { border-color: var(--accent); background: #f0f8ff; color: var(--accent); font-weight: 600; }
-        .mode-desc { font-size: 11px; color: var(--sub-text); margin-top: 4px; }
+        .mode-desc { font-size: 10px; color: var(--sub-text); margin-top: 2px; }
 
-        .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid #f5f5f7; margin-bottom: 16px; }
-        .stat-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .badge-area { font-size: 11px; font-weight: 700; height: 16px; display: flex; gap: 5px; justify-content: flex-end;}
+        /* Game Header - コンパクト化 */
+        .header { 
+            display: flex; justify-content: space-between; align-items: flex-end; 
+            padding-bottom: 8px; border-bottom: 1px solid #f5f5f7; margin-bottom: 10px; flex-shrink: 0;
+        }
+        .stat-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .badge-area { font-size: 10px; font-weight: 700; height: 14px; display: flex; gap: 4px; justify-content: flex-end;}
         .pen-badge { color: var(--danger); display: none; }
         .bonus-badge { color: var(--success); display: none; }
         .show { display: inline; animation: flash 1s; }
 
-        .formula-container { margin-bottom: 16px; position: relative; }
+        /* Formula Area */
+        .formula-container { margin-bottom: 10px; position: relative; flex-shrink: 0; }
         .formula-box {
-            height: 64px; background: #f5f5f7; border-radius: 12px;
+            height: 50px; background: #f5f5f7; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 26px; font-weight: 500;
+            font-size: 24px; font-weight: 500;
             border: 2px solid transparent; overflow: hidden; white-space: nowrap; transition: 0.3s;
         }
         .formula-box.error { border-color: var(--danger); color: var(--danger); }
         .formula-box.success { border-color: var(--success); color: var(--success); background: #eaffef; }
-        .formula-box.prime-success { border-color: var(--prime); color: var(--prime); background: #fcf5ff; }
+        .formula-box.prime-active { border-color: var(--prime); background: #fcf5ff; color: var(--prime); }
+        .formula-box.prime-active.success { background: #fcf5ff; color: var(--prime); border-color: var(--prime); }
 
-        .prime-info { display: flex; justify-content: flex-end; font-size: 11px; color: var(--sub-text); margin-top: 4px; padding-right: 4px; }
+        .prime-info { display: flex; justify-content: flex-end; font-size: 10px; color: var(--sub-text); margin-top: 2px; padding-right: 4px; }
 
+        /* Field - 高さ調整 */
         .field {
-            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-            align-content: flex-start; margin-bottom: auto; min-height: 120px;
+            display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+            align-content: flex-start; margin-bottom: auto; 
+            overflow-y: auto; /* カードが多い場合にスクロール可能に */
+            padding-bottom: 10px;
+            flex-grow: 1; /* 残りのスペースを埋める */
         }
         .card {
             background: #fff; border: 1px solid var(--border); border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: 600; cursor: pointer;
-            width: calc(20% - 7px); aspect-ratio: 0.8;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative;
+            font-size: 20px; font-weight: 600; cursor: pointer;
+            width: calc(20% - 6px); aspect-ratio: 0.85;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative;
         }
-        .field.hard .card { width: calc(14.2% - 7px); font-size: 20px; }
-        .card.selected { background: var(--text); color: #fff; border-color: var(--text); transform: translateY(-4px); }
+        .field.hard .card { width: calc(14.2% - 6px); font-size: 16px; }
+        .card.selected { background: var(--text); color: #fff; border-color: var(--text); transform: translateY(-2px); }
         .card.empty { visibility: hidden; pointer-events: none; }
 
-        .controls { background: #f5f5f7; border-radius: 16px; padding: 12px; }
-        .sub-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+        /* Controls - 固定高さ確保 */
+        .controls { background: #f5f5f7; border-radius: 16px; padding: 10px; flex-shrink: 0; }
+        .sub-actions { display: flex; gap: 8px; margin-bottom: 8px; }
         .btn-sub {
-            flex: 1; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 8px;
+            flex: 1; padding: 8px; font-size: 11px; font-weight: 600; border-radius: 8px;
             border: 1px solid #e5e5ea; background: #fff; color: var(--sub-text); cursor: pointer;
         }
 
-        .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
         .key.hard-only { display: none; }
         .keypad.hard-mode .key.hard-only { display: flex; background: #fff5f5; color: #d63384; }
         
         .key {
-            height: 44px; background: #fff; border: 1px solid #e5e5ea; border-radius: 8px;
-            font-size: 16px; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center;
+            height: 40px; background: #fff; border: 1px solid #e5e5ea; border-radius: 8px;
+            font-size: 15px; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
         .key:active { background: #e5e5ea; }
         .key.op { color: var(--accent); font-weight: 600; }
-        .key.func { font-size: 11px; font-weight: 700; color: var(--sub-text); }
+        .key.func { font-size: 10px; font-weight: 700; color: var(--sub-text); }
         .key.enter { grid-column: span 3; background: var(--accent); color: #fff; border: none; font-weight: 600; }
-        .key.prime { grid-column: span 2; background: var(--prime); color: #fff; border: none; font-weight: 600; font-size: 14px; }
+        .key.prime { grid-column: span 2; background: var(--prime); color: #fff; border: none; font-weight: 600; font-size: 13px; }
         .key.del { color: var(--danger); }
 
         .rank-list {
-            margin-top: 24px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
-            max-height: 250px; overflow-y: auto; background: #fff;
+            margin-top: 20px; border: 1px solid #e5e5ea; border-radius: 12px; overflow: hidden;
+            max-height: 40vh; overflow-y: auto; background: #fff; flex: 1;
         }
-        .rank-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f5f5f7; font-size: 14px; }
+        .rank-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f5f5f7; font-size: 13px; }
         .rank-row:last-child { border-bottom: none; }
-        .rank-left { display: flex; align-items: center; flex: 1; overflow: hidden; margin-right: 12px; }
+        .rank-left { display: flex; align-items: center; flex: 1; overflow: hidden; margin-right: 10px; }
         .rank-right { font-weight: 700; white-space: nowrap; }
         .rank-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+        
         .rank-1, .rank-2, .rank-3 { font-weight: 600; }
         .rank-1 { background-color: #fffae6; }
         .rank-2 { background-color: #f8f8f8; }
         .rank-3 { background-color: #fff4e6; }
-        .rank-icon { display: inline-block; width: 20px; text-align: center; margin-right: 6px; flex-shrink: 0; }
+        .rank-icon { display: inline-block; width: 18px; text-align: center; margin-right: 6px; flex-shrink: 0; }
         .rank-num { color: var(--sub-text); font-weight: 600; }
 
-        .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+        .badge { padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: 700; margin-right: 6px; flex-shrink: 0; }
         .badge-easy { background: #e3f2fd; color: var(--accent); }
         .badge-hard { background: #ffebee; color: var(--danger); }
         
-        .res-info { display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #e5e5ea; padding-bottom: 12px; margin-bottom: 12px; }
+        .res-info { display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; margin-bottom: 10px; }
         
         @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0} }
     </style>
@@ -292,7 +307,7 @@
             <span class="label" style="width:100%">TOP 7 PLAYERS</span>
             <div id="ranking" class="rank-list">Loading...</div>
             
-            <button class="btn btn-primary" style="margin-top:auto;" onclick="location.reload()">PLAY AGAIN</button>
+            <button class="btn btn-primary" style="margin-top:10px;" onclick="location.reload()">PLAY AGAIN</button>
         </div>
     </div>
 </div>
@@ -414,7 +429,7 @@
             document.getElementById('deck-disp').innerText = this.deck.length;
             const fBox = document.getElementById('formula');
             fBox.innerText = this.input.map(i => i.val).join(' ');
-            fBox.className = 'formula-box'; // reset
+            fBox.className = 'formula-box';
 
             const container = document.getElementById('field');
             container.innerHTML = '';
@@ -489,13 +504,15 @@
         successPrime(newPrime) {
             this.lastPrime = newPrime;
             document.getElementById('last-prime').innerText = newPrime;
-            this.flashSuccess('prime-success', "-5s PRIME!");
+            this.flashSuccess('prime-active', "-5s PRIME!");
             this.processSuccess(5);
         },
         
         flashSuccess(cls, msg) {
             const fb = document.getElementById('formula');
             fb.classList.add(cls);
+            if(cls === 'prime-active') fb.classList.add('success');
+            
             const badge = document.getElementById('bonus-badge');
             badge.innerText = msg;
             badge.classList.remove('show');
